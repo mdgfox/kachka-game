@@ -61,6 +61,19 @@ export const playerResourcesManifest: AssetsManifest = {
                     alias: "start",
                     src: "public/assets/player/dino-start.png",
                 },
+                {
+                    alias: "ground",
+                    src: "public/assets/ground.png"
+                }
+            ]
+        },
+        {
+            name: "ui",
+            assets: [
+                {
+                    alias: "restartButton",
+                    src: "public/assets/button.png"
+                }
             ]
         },
     ]

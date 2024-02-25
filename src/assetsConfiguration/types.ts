@@ -19,3 +19,12 @@ export interface RunAssets {
     run_1: Texture;
     run_2: Texture;
 }
+
+export interface UIAssets {
+    restartButton: Texture;
+}
+
+export interface CommonAssets {
+    start: Texture;
+    ground: Texture;
+}

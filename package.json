@@ -12,7 +12,9 @@
     "watch": "webpack --config webpack.config.dev.js --watch"
   },
   "dependencies": {
+    "@pixi/ui": "^0.10.5",
     "@types/pixi.js": "^5.0.0",
+    "pixi-ease": "^3.0.7",
     "pixi.js": "7.3.2",
     "tsconfig-paths-webpack-plugin": "^4.1.0"
   },
