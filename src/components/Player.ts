@@ -1,36 +1,37 @@
-import {AnimatedSprite, Assets, Container} from "pixi.js";
-import {DeadAssets, DuckAssets, IdleAssets, RunAssets } from "./assetsConfiguration/types";
+import {AnimatedSprite, Assets, Sprite} from "pixi.js";
+import {CommonAssets, DeadAssets, DuckAssets, IdleAssets, RunAssets} from "../assetsConfiguration/types";
+import { sound } from "@pixi/sound";
 import { ease } from "pixi-ease";
 
-export class Player extends Container {
+export class Player extends Sprite {
     protected deadAssets: DeadAssets;
     protected duckAssets: DuckAssets;
     protected idleAssets: IdleAssets;
     protected runAssets: RunAssets;
+    protected commonAssets: CommonAssets;
 
-    private dinoAnimation: AnimatedSprite;
+    public dinoAnimation: AnimatedSprite;
 
     private duckDownProcess: boolean = false;
+    private jumpProcess: boolean = false;
 
-    private constructor(assets: {deadAssets: DeadAssets, duckAssets: DuckAssets, idleAssets: IdleAssets, runAssets: RunAssets}) {
+    private constructor(
+        assets: {deadAssets: DeadAssets, duckAssets: DuckAssets, idleAssets: IdleAssets, runAssets: RunAssets, commonAssets: CommonAssets}) {
         super();
-        const {deadAssets, duckAssets, idleAssets, runAssets} = assets;
+        const {deadAssets, duckAssets, idleAssets, runAssets, commonAssets} = assets;
         this.deadAssets = deadAssets;
         this.duckAssets = duckAssets;
         this.idleAssets = idleAssets;
         this.runAssets = runAssets;
+        this.commonAssets = commonAssets;
 
-        this.dinoAnimation = new AnimatedSprite([idleAssets.idle_1, idleAssets.idle_2]);
+        this.dinoAnimation = new AnimatedSprite([commonAssets.start]);
         this.dinoAnimation.animationSpeed = 0.2;
-        this.dinoAnimation.position.set(70, 180);
+        this.dinoAnimation.position.set(70, 360);
         this.dinoAnimation.anchor.set(0.5, 1);
         this.dinoAnimation.play();
         this.addChild(this.dinoAnimation);
-
-        window.addEventListener("keydown", this.jump.bind(this), false);
-        window.addEventListener("keydown", this.duckDown.bind(this), false);
-        window.addEventListener("keyup", this.duckUp.bind(this), false);
-
+        this._bounds.pad(-5);
     }
 
     public static async build(): Promise<Player> {
@@ -38,16 +39,27 @@ export class Player extends Container {
         const duckAssets = await Assets.loadBundle('duck');
         const idleAssets = await Assets.loadBundle('idle');
         const runAssets = await Assets.loadBundle('run');
+        const commonAssets = await Assets.loadBundle('common');
 
-        return new Player({deadAssets, duckAssets, idleAssets, runAssets});
+        sound.add('jump', 'public/assets/sounds/jump.wav');
+
+        return new Player({deadAssets, duckAssets, idleAssets, runAssets, commonAssets});
     }
 
-    private runAnimation() {
+    public start() {
+        window.addEventListener("keydown", this.jump.bind(this), false);
+        window.addEventListener("keydown", this.duckDown.bind(this), false);
+        window.addEventListener("keyup", this.duckUp.bind(this), false);
+
+        this.runAnimation();
+    }
+
+    public runAnimation() {
         this.removeChild(this.dinoAnimation);
 
         this.dinoAnimation = new AnimatedSprite([this.runAssets.run_1, this.runAssets.run_2]);
         this.dinoAnimation.animationSpeed = 0.2;
-        this.dinoAnimation.position.set(70, 180);
+        this.dinoAnimation.position.set(70, 360);
         this.dinoAnimation.anchor.set(0.5, 1);
         this.dinoAnimation.play();
 
@@ -59,26 +71,27 @@ export class Player extends Container {
 
         this.dinoAnimation = new AnimatedSprite([this.duckAssets.duck_1, this.duckAssets.duck_2]);
         this.dinoAnimation.animationSpeed = 0.2;
-        this.dinoAnimation.position.set(70, 180);
+        this.dinoAnimation.position.set(70, 360);
         this.dinoAnimation.anchor.set(0.5, 1);
         this.dinoAnimation.play();
 
         this.addChild(this.dinoAnimation);
     }
 
-    private run() {
-        this.runAnimation();
-
-    }
     private jump(event: KeyboardEvent) {
-        if(event.code === "Space" || event.code === "ArrowUp") {
+        if((event.code === "Space" || event.code === "ArrowUp") && !this.jumpProcess) {
+            this.jumpProcess = true;
+            sound.play("jump");
             this.removeChild(this.dinoAnimation);
             this.dinoAnimation = new AnimatedSprite([this.idleAssets.idle_1]);
-            this.dinoAnimation.position.set(70, 180);
+            this.dinoAnimation.position.set(70, 360);
             this.dinoAnimation.anchor.set(0.5, 1);
             this.addChild(this.dinoAnimation);
-            const easing = ease.add(this.dinoAnimation, { y: 100}, { duration: 200, reverse: true, ease: "easeInOutSine" });
-            easing.once("complete", () => this.run());
+            const easing = ease.add(this.dinoAnimation, { y: 100}, { duration: 300, reverse: true, ease: "easeOutSine" });
+            easing.once("complete", () => {
+                this.runAnimation();
+                this.jumpProcess = false;
+            });
         }
     }
 

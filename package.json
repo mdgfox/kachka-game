@@ -12,6 +12,7 @@
     "watch": "webpack --config webpack.config.dev.js --watch"
   },
   "dependencies": {
+    "@pixi/sound": "^5.2.3",
     "@pixi/ui": "^0.10.5",
     "@types/pixi.js": "^5.0.0",
     "pixi-ease": "^3.0.7",

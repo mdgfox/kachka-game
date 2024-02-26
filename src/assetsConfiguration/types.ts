@@ -28,3 +28,17 @@ export interface CommonAssets {
     start: Texture;
     ground: Texture;
 }
+
+export interface ObstaclesAssets {
+    cactus_big_1: Texture;
+    cactus_big_2: Texture;
+    cactus_big_3: Texture;
+    cactus_small_1: Texture;
+    cactus_small_2: Texture;
+    cactus_small_3: Texture;
+}
+
+export interface BirdAssets {
+    bird_1: Texture;
+    bird_2: Texture;
+}

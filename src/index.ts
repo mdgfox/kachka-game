@@ -1,5 +1,6 @@
 /* eslint-disable */
-import {Game} from "./Game";
+
+import {Game} from "./components/Game";
 
 const game = new Game();
 

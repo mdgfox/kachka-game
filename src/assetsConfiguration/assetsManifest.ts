@@ -76,5 +76,47 @@ export const playerResourcesManifest: AssetsManifest = {
                 }
             ]
         },
+        {
+            name: "obstacles",
+            assets: [
+                {
+                    alias: "cactus_big_1",
+                    src: "public/assets/obstacles/cactus-big-1.png",
+                },
+                {
+                    alias: "cactus_big_2",
+                    src: "public/assets/obstacles/cactus-big-2.png",
+                },
+                {
+                    alias: "cactus_big_3",
+                    src: "public/assets/obstacles/cactus-big-3.png",
+                },
+                {
+                    alias: "cactus_small_1",
+                    src: "public/assets/obstacles/cactus-small-1.png",
+                },
+                {
+                    alias: "cactus_small_2",
+                    src: "public/assets/obstacles/cactus-small-2.png",
+                },
+                {
+                    alias: "cactus_small_3",
+                    src: "public/assets/obstacles/cactus-small-3.png",
+                }
+            ]
+        },
+        {
+            name: "bird",
+            assets: [
+                {
+                    alias: "bird_1",
+                    src: "public/assets/obstacles/bird/bird-1.png",
+                },
+                {
+                    alias: "bird_2",
+                    src: "public/assets/obstacles/bird/bird-2.png",
+                },
+            ]
+        }
     ]
 }

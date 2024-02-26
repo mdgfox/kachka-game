@@ -1,0 +1,115 @@
+import {Application, Assets, FederatedPointerEvent, Ticker} from "pixi.js";
+import {GameOverComponent} from "./GameOverComponent";
+import {GroundComponent} from "./GroundComponent";
+import {Player} from "./Player";
+import {ScoreComponent} from "./ScoreComponent";
+import {playerResourcesManifest} from "../assetsConfiguration/assetsManifest";
+import {StartGameComponent} from "./StartGameComponent";
+import {ObstaclesFactory} from "./ObstaclesFactory";
+
+export class Game extends Application {
+    public static WIDTH = 800;
+    public static HEIGHT = 400;
+
+    public startGameComponent: StartGameComponent | undefined;
+    public scoreComponent: ScoreComponent | undefined;
+    public gameOverComponent: GameOverComponent | undefined;
+    public groundComponent: GroundComponent | undefined;
+    public player: Player | undefined;
+    public obstaclesFactory: ObstaclesFactory | undefined;
+
+    private startGameSignature: ((event: KeyboardEvent) => Promise<void>) | undefined;
+    private restartGameSignature: ((event: FederatedPointerEvent) => Promise<void>) | undefined;
+
+    private readonly sharedTicker: Ticker;
+
+    public constructor() {
+        super(
+            {
+                backgroundColor: "#202124",
+                backgroundAlpha: 1.0,
+                width: Game.WIDTH,
+                height: Game.HEIGHT,
+                antialias: true
+            }
+        );
+
+        this.sharedTicker = Ticker.shared;
+        this.sharedTicker.autoStart = false;
+        this.sharedTicker.stop();
+    }
+
+    public async launch() {
+        Assets.addBundle('fonts', {
+            "Pixelify": '/public/PixelifySans.ttf',
+        });
+
+        await Assets.init({ manifest: playerResourcesManifest });
+
+        await Assets.loadBundle("fonts");
+
+        this.startGameComponent = new StartGameComponent();
+        this.stage.addChild(this.startGameComponent);
+
+        this.player = await Player.build();
+        this.stage.addChild(this.player);
+
+        this.obstaclesFactory = await ObstaclesFactory.build(this.stage, this.player,() => this.endGame(), this.sharedTicker);
+
+        this.startGameSignature = (e) => this.startGame(e);
+
+        window.addEventListener("keydown", this.startGameSignature, false);
+    }
+
+    public async startGame(event: KeyboardEvent) {
+        if(event.code === "Space" || event.code === "ArrowUp") {
+            this.scoreComponent = new ScoreComponent(this.sharedTicker);
+            this.stage.addChild(this.scoreComponent);
+
+            this.groundComponent =  await GroundComponent.build(this.sharedTicker);
+            this.stage.addChild(this.groundComponent);
+
+            if(this.startGameComponent) {
+                this.stage.removeChild(this.startGameComponent);
+            }
+
+            this.sharedTicker.start();
+
+            this.player?.start();
+
+            this.obstaclesFactory?.start();
+
+            this.stage.setChildIndex(this.groundComponent, 0);
+
+            window.removeEventListener("keydown", this.startGameSignature!, false);
+        }
+    }
+
+    public async endGame()  {
+        this.sharedTicker.stop();
+
+        this.gameOverComponent = await GameOverComponent.build(this.restartGame.bind(this));
+        this.stage.addChild(this.gameOverComponent);
+
+        this.scoreComponent?.writeLocalStorage();
+    }
+
+    public async restartGame() {
+        this.player?.runAnimation();
+
+        if(this.gameOverComponent) {
+            this.gameOverComponent.destroy();
+        }
+
+        this.scoreComponent?.restoreDefault();
+
+        this.groundComponent?.restoreDefault();
+
+        this.obstaclesFactory?.restoreDefault();
+
+        this.player?.start();
+
+        this.sharedTicker.speed = 1;
+        this.sharedTicker.start();
+    }
+}
