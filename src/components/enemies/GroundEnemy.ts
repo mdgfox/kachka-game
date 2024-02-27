@@ -1,7 +1,7 @@
 import {IDestroyOptions, Sprite, Texture, Ticker} from "pixi.js";
-import {Player} from "./Player";
+import {Player} from "../Player";
 
-export class Cactus extends Sprite {
+export class GroundEnemy extends Sprite {
     private readonly player: Player;
     private readonly sharedTicker: Ticker;
 

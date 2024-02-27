@@ -1,12 +1,12 @@
-import {BirdAssets, ObstaclesAssets} from "../assetsConfiguration/types";
-import {Assets, Container, Ticker} from "pixi.js";
-import {Cactus} from "./Cactus";
-import {Player} from "./Player";
-import {Bird} from "./Bird";
+import {Assets, Container, Texture, Ticker} from "pixi.js";
+import {GroundEnemy} from "./GroundEnemy";
+import {FlyEnemy} from "./FlyEnemy";
+import {ObstaclesAssets} from "../../assetsConfiguration/types";
+import {Player} from "../Player";
 
 export class ObstaclesFactory {
     private readonly assets: ObstaclesAssets;
-    private readonly birdAssets: BirdAssets;
+    private readonly groundAssets: Array<Texture> = [];
     private readonly spawnContainer: Container;
     private readonly minInterval: number;
     private readonly maxInterval: number;
@@ -17,9 +17,12 @@ export class ObstaclesFactory {
     private readonly player: Player;
     private readonly gameOverCallback: () => void;
 
-    private constructor(assets: ObstaclesAssets, birdAssets: BirdAssets, container: Container, player: Player, ticker: Ticker, gameOverCallback: () => void, min: number = 100, max: number = 500) {
+    private constructor(assets: ObstaclesAssets, container: Container, player: Player, ticker: Ticker, gameOverCallback: () => void, min: number = 100, max: number = 500) {
         this.assets = assets;
-        this.birdAssets = birdAssets;
+        this.groundAssets = Object.keys(this.assets)
+            .filter(key => !["fly_1", "fly_2"]
+            .includes(key))
+            .map(key => assets[key as keyof ObstaclesAssets]);
         this.spawnContainer = container;
         this.player = player;
         this.gameOverCallback = gameOverCallback;
@@ -31,10 +34,9 @@ export class ObstaclesFactory {
     }
 
     public static async build(container: Container, player: Player, gameOverCallback: () => void, ticker: Ticker) {
-        const obstaclesAssets = await Assets.loadBundle('obstacles');
-        const birdAssets = await Assets.loadBundle("bird");
+        const assets = await Assets.loadBundle('obstacles');
 
-        return new ObstaclesFactory(obstaclesAssets, birdAssets, container, player, ticker, gameOverCallback);
+        return new ObstaclesFactory(assets, container, player, ticker, gameOverCallback);
     }
 
     start() {
@@ -52,16 +54,14 @@ export class ObstaclesFactory {
         const obstacleType = this.getRandom(1, 2);
         switch (obstacleType) {
             case 1: {
-                const bird = new Bird(this.birdAssets, this.player, this.getRandom(150, 220), this.gameOverCallback, this.sharedTicker);
+                const bird = new FlyEnemy(this.assets, this.player, this.getRandom(150, 220), this.gameOverCallback, this.sharedTicker);
                 this.spawnContainer.addChild(bird);
                 break;
             }
             case 2:
             default: {
-                const keys =  Object.keys(this.assets);
-                const key = keys[this.getRandom(0, keys.length - 1)];
-
-                const obstacle = new Cactus(this.assets[key as keyof ObstaclesAssets], this.player, this.gameOverCallback, this.sharedTicker);
+                const texture = this.groundAssets[this.getRandom(0, this.groundAssets.length - 1)];
+                const obstacle = new GroundEnemy(texture, this.player, this.gameOverCallback, this.sharedTicker);
                 this.spawnContainer.addChild(obstacle);
                 break;
             }
@@ -74,7 +74,7 @@ export class ObstaclesFactory {
 
     restoreDefault() {
         for(let i = 0; i < this.spawnContainer.children.length; i++) {
-            if(this.spawnContainer.children[i] instanceof Cactus || this.spawnContainer.children[i] instanceof Bird) {
+            if(this.spawnContainer.children[i] instanceof GroundEnemy || this.spawnContainer.children[i] instanceof FlyEnemy) {
                 this.spawnContainer.children[i].destroy();
             }
         }

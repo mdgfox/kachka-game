@@ -1,11 +1,12 @@
-import {Application, Assets, FederatedPointerEvent, Ticker} from "pixi.js";
-import {GameOverComponent} from "./GameOverComponent";
+import {Application, Assets, Ticker} from "pixi.js";
 import {GroundComponent} from "./GroundComponent";
 import {Player} from "./Player";
-import {ScoreComponent} from "./ScoreComponent";
 import {playerResourcesManifest} from "../assetsConfiguration/assetsManifest";
-import {StartGameComponent} from "./StartGameComponent";
-import {ObstaclesFactory} from "./ObstaclesFactory";
+import {sound} from "@pixi/sound";
+import {StartGameComponent} from "./interface/StartGameComponent";
+import {ScoreComponent} from "./interface/ScoreComponent";
+import {GameOverComponent} from "./interface/GameOverComponent";
+import {ObstaclesFactory} from "./enemies/ObstaclesFactory";
 
 export class Game extends Application {
     public static WIDTH = 800;
@@ -19,7 +20,6 @@ export class Game extends Application {
     public obstaclesFactory: ObstaclesFactory | undefined;
 
     private startGameSignature: ((event: KeyboardEvent) => Promise<void>) | undefined;
-    private restartGameSignature: ((event: FederatedPointerEvent) => Promise<void>) | undefined;
 
     private readonly sharedTicker: Ticker;
 
@@ -41,12 +41,14 @@ export class Game extends Application {
 
     public async launch() {
         Assets.addBundle('fonts', {
-            "Pixelify": '/public/PixelifySans.ttf',
+            "Pixelify": './public/assets/PixelifySans.ttf',
         });
 
         await Assets.init({ manifest: playerResourcesManifest });
 
         await Assets.loadBundle("fonts");
+
+        this.loadSounds();
 
         this.startGameComponent = new StartGameComponent();
         this.stage.addChild(this.startGameComponent);
@@ -66,7 +68,7 @@ export class Game extends Application {
             this.scoreComponent = new ScoreComponent(this.sharedTicker);
             this.stage.addChild(this.scoreComponent);
 
-            this.groundComponent =  await GroundComponent.build(this.sharedTicker);
+            this.groundComponent = await GroundComponent.build(this.sharedTicker);
             this.stage.addChild(this.groundComponent);
 
             if(this.startGameComponent) {
@@ -85,7 +87,7 @@ export class Game extends Application {
         }
     }
 
-    public async endGame()  {
+    public async endGame() {
         this.sharedTicker.stop();
 
         this.gameOverComponent = await GameOverComponent.build(this.restartGame.bind(this));
@@ -111,5 +113,13 @@ export class Game extends Application {
 
         this.sharedTicker.speed = 1;
         this.sharedTicker.start();
+    }
+
+    private loadSounds() {
+        sound.add({
+            "jump": "public/assets/sounds/jump.wav",
+            "gameOver": "public/assets/sounds/gameOver.wav",
+            "achievement": "public/assets/sounds/achievement.wav"
+        });
     }
 }

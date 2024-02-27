@@ -1,4 +1,4 @@
-import {Assets, Sprite, Texture, Ticker} from "pixi.js";
+import { Assets, Sprite, Texture, Ticker } from "pixi.js";
 import {CommonAssets} from "../assetsConfiguration/types";
 
 export class GroundComponent extends Sprite{
@@ -21,7 +21,7 @@ export class GroundComponent extends Sprite{
     public static async build(ticker: Ticker): Promise<GroundComponent> {
         const commonAssets: CommonAssets = await Assets.loadBundle("common");
 
-        return new GroundComponent(commonAssets.ground, ticker);
+        return new GroundComponent(commonAssets.land, ticker);
     }
 
     private update(deltaTime: number) {

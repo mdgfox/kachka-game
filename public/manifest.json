@@ -1,0 +1,66 @@
+{
+    "name": "Duck Game",
+    "description": "Just relax, and spend few minutes with playing running duck!",
+    "version": "1.0.0",
+    "manifest_version": 3,
+    "background": {},
+    "permissions": [
+        "storage",
+        "scripting"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "index.js"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "public/assets/PixelifySans.ttf",
+                "public/assets/dino/ground.png",
+                "public/assets/dino/button.png",
+                "public/assets/sounds/achievement.wav",
+                "public/assets/sounds/gameOver.wav",
+                "public/assets/sounds/jump.wav",
+                "public/assets/dino/player/dead/dino-dead.png",
+                "public/assets/dino/player/dead/dino-dead-outline.png",
+                "public/assets/dino/player/duck/dino-duck-1.png",
+                "public/assets/dino/player/duck/dino-duck-2.png",
+                "public/assets/dino/player/idle/dino-idle-1.png",
+                "public/assets/dino/player/idle/dino-idle-2.png",
+                "public/assets/dino/player/run/dino-run-1.png",
+                "public/assets/dino/player/run/dino-run-2.png",
+                "public/assets/dino/player/dino-start.png",
+                "public/assets/dino/obstacles/bird/bird-1.png",
+                "public/assets/dino/obstacles/bird/bird-2.png",
+                "public/assets/dino/obstacles/cactus-big-1.png",
+                "public/assets/dino/obstacles/cactus-big-2.png",
+                "public/assets/dino/obstacles/cactus-big-3.png",
+                "public/assets/dino/obstacles/cactus-small-1.png",
+                "public/assets/dino/obstacles/cactus-small-2.png",
+                "public/assets/dino/obstacles/cactus-small-3.png"
+            ],
+            "use_dynamic_url": true
+        }
+    ],
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": {
+            "16": "/icons/16.png",
+            "32": "/icons/32.png",
+            "48": "/icons/48.png",
+            "128": "/icons/128.png"
+        }
+    },
+    "icons": {
+        "16": "/icons/16.png",
+        "32": "/icons/32.png",
+        "48": "/icons/48.png",
+        "128": "/icons/128.png"
+    }
+}

@@ -1,13 +1,12 @@
 import {Container, Ticker, Text, TextStyle} from "pixi.js";
-import {Game} from "./Game";
 import {sound} from "@pixi/sound";
+import {Game} from "../Game";
 
 export class ScoreComponent extends Container {
     private readonly localStorageKey = "highScoreValue";
 
     private currentScore: number = 0;
     private achievement: number = 0;
-    private levelHard: number = 0;
 
     private sharedTicker: Ticker;
 
@@ -22,7 +21,7 @@ export class ScoreComponent extends Container {
     constructor(ticker: Ticker) {
         super();
 
-        this.sharedTicker = ticker
+        this.sharedTicker = ticker;
         this.sharedTicker.add(this.update, this);
 
         const hi = this.formatScore(this.readLocalStorage());
@@ -32,16 +31,14 @@ export class ScoreComponent extends Container {
         this.addChild(this.textComponent);
 
         this.textComponent.anchor.set(1, 0);
-        this.textComponent.position.set(Game.WIDTH, 0);
-        sound.add('achievement', 'public/assets/sounds/achievement.wav');
+        this.textComponent.position.set(Game.WIDTH - 20, 0);
     }
 
     restoreDefault() {
         this.currentScore = 0;
         this.achievement = 0;
-        this.levelHard = 0;
 
-        this.updateTextComponent(this.readLocalStorage(), this.currentScore)
+        this.updateTextComponent(this.readLocalStorage(), this.currentScore);
     }
 
     private updateTextComponent(hi: number, current: number) {
@@ -53,12 +50,8 @@ export class ScoreComponent extends Container {
         this.updateTextComponent(this.readLocalStorage(), this.currentScore);
         if(this.currentScore - this.achievement > 100) {
             this.achievement = this.currentScore;
+            this.sharedTicker.speed = this.sharedTicker.speed * 1.2;
             sound.play("achievement");
-        }
-
-        if(this.currentScore - this.levelHard > 150) {
-            this.levelHard = this.currentScore;
-            this.sharedTicker.speed = this.sharedTicker.speed * 1.3;
         }
     }
 

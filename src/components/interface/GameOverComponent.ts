@@ -1,20 +1,28 @@
 import {Assets, Container, IDestroyOptions, Sprite, Text, TextStyle, Texture} from "pixi.js";
-import {UIAssets} from "../assetsConfiguration/types";
 import {sound} from "@pixi/sound";
-import {Game} from "./Game";
+import {CommonAssets} from "../../assetsConfiguration/types";
+import {Game} from "../Game";
 
 export class GameOverComponent extends Container {
     private readonly buttonTexture: Texture;
+    private readonly textStyles: TextStyle = new TextStyle({
+        fontFamily: 'PixelifySans',
+        stroke: "white",
+        strokeThickness: 5,
+        fill:"#535353",
+        fontSize: 50
+    });
+
     private readonly restartCallback: () => void;
     private readonly restartGameHotKeySignature: (event: KeyboardEvent) => void;
-    private constructor(uiAssets: UIAssets, restartCallback: () => void) {
+    private constructor(assets: CommonAssets, restartCallback: () => void) {
         super();
 
-        const text = new Text('Game Over', new TextStyle({ fontFamily: 'PixelifySans', stroke: "white", strokeThickness: 5, fill:"#535353", fontSize: 50 }));
+        const text = new Text('Game Over', this.textStyles);
         text.anchor.set(0.5, 0.5);
         this.addChild(text);
 
-        this.buttonTexture = uiAssets.restartButton;
+        this.buttonTexture = assets.button;
         const buttonView = new Sprite(this.buttonTexture);
         buttonView.eventMode = 'static';
         buttonView.anchor.set(0.5, 0.5);
@@ -32,10 +40,9 @@ export class GameOverComponent extends Container {
     }
 
     public static async build(restartGameCallback: () => void): Promise<GameOverComponent> {
-        const uiAssets: UIAssets = await Assets.loadBundle("ui");
-        sound.add("gameOver", "public/assets/sounds/gameOver.wav");
+        const assets: CommonAssets = await Assets.loadBundle("common");
 
-        return new GameOverComponent(uiAssets, restartGameCallback);
+        return new GameOverComponent(assets, restartGameCallback);
     }
 
     private restartGameHotKey(event: KeyboardEvent) {

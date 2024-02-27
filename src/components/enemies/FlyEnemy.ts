@@ -1,8 +1,8 @@
 import {AnimatedSprite, IDestroyOptions, Sprite, Ticker} from "pixi.js";
-import {Player} from "./Player";
-import {BirdAssets} from "../assetsConfiguration/types";
+import {Player} from "../Player";
+import {ObstaclesAssets} from "../../assetsConfiguration/types";
 
-export class Bird extends Sprite {
+export class FlyEnemy extends Sprite {
     private readonly player: Player;
     private readonly sharedTicker: Ticker;
 
@@ -11,10 +11,10 @@ export class Bird extends Sprite {
 
     private readonly gameOverCallback: () => void;
 
-    public constructor(assets: BirdAssets, player: Player, y: number = 150, gameOverCallback: () => void, ticker: Ticker) {
+    public constructor(assets: ObstaclesAssets, player: Player, y: number = 150, gameOverCallback: () => void, ticker: Ticker) {
         super();
 
-        this.animation = new AnimatedSprite([assets.bird_1, assets.bird_2]);
+        this.animation = new AnimatedSprite([assets.fly_1, assets.fly_2]);
         this.animation.animationSpeed = 0.2;
         this.animation.play();
         this.addChild(this.animation);
