@@ -29,14 +29,14 @@ jobs:
     - name: package.json version patch
       id: version-patch
       run: |
-        npm version patch
-        result=$(dot-json package.json version)
+        npm version --patch
+        result=$(npx dot-json@1 package.json version)
         echo "version=${result}" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: manifest.json version patch
       run: |
-        dot-json ./public/manifest.json version "${{ steps.version-patch.outputs.version }}"
+        npx dot-json@1 ./public/manifest.json version "${{ steps.version-patch.outputs.version }}"
 
     - name: Git Push diff
       run: |
