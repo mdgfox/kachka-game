@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    if: github.event.commits[0].author.name != '${GITHUB_ACTOR}'
+    if: github.event.commits[0].author.name != 'GitHubActions'
     runs-on: ubuntu-latest
 
     strategy:
@@ -23,8 +23,8 @@ jobs:
 
     - name: Configure git
       run: |
-        git config user.name '${GITHUB_ACTOR}'
-        git config user.email '${GITHUB_ACTOR}@users.noreply.github.com'
+        git config user.name "Automation User"
+        git config user.email "<>"
 
     - name: package.json version patch
       id: version-patch
