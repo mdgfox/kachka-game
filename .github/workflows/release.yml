@@ -23,7 +23,7 @@ jobs:
 
     - name: Configure git
       run: |
-        git config user.name "Automation User"
+        git config user.name "GitHubActions"
         git config user.email "<>"
 
     - name: package.json version patch
@@ -48,7 +48,7 @@ jobs:
 
     - name: Build extension
       run: |
-        npm i
+        npm i --force
         npm run build-game:ext
 
     - name: Upload artifact
