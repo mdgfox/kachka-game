@@ -29,7 +29,7 @@ jobs:
     - name: package.json version patch
       id: version-patch
       run: |
-        npm version --patch
+        npm version patch
         result=$(dot-json package.json version)
         echo "version=${result}" >> $GITHUB_OUTPUT
       shell: bash
