@@ -36,7 +36,7 @@ export class FlyEnemy extends Sprite {
         } else {
             this.position.set(updX, this.flyHeight);
             // check collision
-            if(this.animation.getBounds().intersects(this.player.dinoAnimation.getBounds())) {
+            if(this.animation.getBounds().intersects(this.player.bounds)) {
                 this.gameOverCallback();
             }
         }

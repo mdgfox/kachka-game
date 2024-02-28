@@ -25,7 +25,7 @@ export class GroundEnemy extends Sprite {
         } else {
             this.position.set(updX, 360);
             // check collision
-            if(this.getBounds().intersects(this.player.dinoAnimation.getBounds())) {
+            if(this.getBounds().intersects(this.player.bounds)) {
                 this.gameOverCallback();
             }
         }

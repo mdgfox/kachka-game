@@ -31,7 +31,9 @@ export class GameOverComponent extends Container {
         this.restartCallback = restartCallback;
         buttonView.on("pointerdown", this.restartCallback, this);
         this.restartGameHotKeySignature = this.restartGameHotKey.bind(this);
-        window.addEventListener("keydown", this.restartGameHotKeySignature, false);
+        setTimeout(() => {
+            window.addEventListener("keyup", this.restartGameHotKeySignature, false);
+        }, 800);
         this.addChild(buttonView);
 
         this.position.set(Game.WIDTH / 2, Game.HEIGHT / 2 - 50);
@@ -52,7 +54,7 @@ export class GameOverComponent extends Container {
     }
 
     override destroy(_options?: IDestroyOptions | boolean) {
-        window.removeEventListener("keydown", this.restartGameHotKeySignature, false);
+        window.removeEventListener("keyup", this.restartGameHotKeySignature, false);
         super.destroy(_options);
     }
 }

@@ -7,7 +7,7 @@
   "repository": "mdgfox/dino-game",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "watch": "webpack --config webpack.config.dev.js --watch",
+    "watch": "webpack --config webpack/webpack.config.dev.js --watch",
     "build-game:dev": "webpack --config webpack/webpack.config.dev.js",
     "build-game:ext": "webpack --config webpack/webpack.config.ext.js",
     "build-game:prod": "webpack --config webpack/webpack.config.prod.js"
@@ -15,8 +15,7 @@
   "dependencies": {
     "@pixi/sound": "5.2.3",
     "@pixi/ui": "0.10.5",
-    "@pixi/unsafe-eval": "^7.4.0",
-    "pixi-ease": "3.0.7",
+    "@pixi/unsafe-eval": "7.4.0",
     "pixi.js": "7.3.2"
   },
   "devDependencies": {
