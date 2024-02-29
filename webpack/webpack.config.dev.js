@@ -21,13 +21,12 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: "src", to: "dest" },
                 { from: "public/assets", to: "public/assets" },
             ],
         }),
         new HTMLWebpackPlugin({
             template: 'src/index.html',
-            title: 'Dino Game'
+            title: 'Game'
         }),
         // Work around for Buffer is undefined:
         // https://github.com/webpack/changelog-v5/issues/10

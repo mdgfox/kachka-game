@@ -1,8 +1,8 @@
 import {Assets, Container, Texture, Ticker} from "pixi.js";
 import {GroundEnemy} from "./GroundEnemy";
 import {FlyEnemy} from "./FlyEnemy";
-import {ObstaclesAssets} from "../../assetsConfiguration/types";
 import {Player} from "../Player";
+import {ObstaclesAssets} from "../types";
 
 export class ObstaclesFactory {
     private readonly assets: ObstaclesAssets;
@@ -43,7 +43,7 @@ export class ObstaclesFactory {
         this.nextObstacleInterval = this.getRandom(this.minInterval, this.maxInterval);
     }
     private update(deltaTime: number) {
-        this.nextObstacleInterval -= deltaTime;
+        this.nextObstacleInterval -= deltaTime * 1.5;
 
         if(this.nextObstacleInterval < 0) {
             this.nextObstacleInterval = this.getRandom(this.minInterval, this.maxInterval);

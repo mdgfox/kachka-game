@@ -1,6 +1,7 @@
 import {Container, Ticker, Text, TextStyle} from "pixi.js";
 import {sound} from "@pixi/sound";
 import {Game} from "../Game";
+import {gameConfig} from "../../configuration/gameConfig";
 
 export class ScoreComponent extends Container {
     private readonly localStorageKey = "highScoreValue";
@@ -46,11 +47,11 @@ export class ScoreComponent extends Container {
     }
 
     private update(deltaTime: number) {
-        this.currentScore += deltaTime * 0.1;
+        this.currentScore += deltaTime * gameConfig.scoreCountMultiplier;
         this.updateTextComponent(this.readLocalStorage(), this.currentScore);
-        if(this.currentScore - this.achievement > 100) {
+        if(this.currentScore - this.achievement > gameConfig.achievementStep) {
             this.achievement = this.currentScore;
-            this.sharedTicker.speed = this.sharedTicker.speed * 1.2;
+            this.sharedTicker.speed = this.sharedTicker.speed * gameConfig.speedStepMultiplier;
             sound.play("achievement");
         }
     }

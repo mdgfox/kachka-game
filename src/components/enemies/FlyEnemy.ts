@@ -1,6 +1,6 @@
 import {AnimatedSprite, IDestroyOptions, Sprite, Ticker} from "pixi.js";
 import {Player} from "../Player";
-import {ObstaclesAssets} from "../../assetsConfiguration/types";
+import {ObstaclesAssets} from "../types";
 
 export class FlyEnemy extends Sprite {
     private readonly player: Player;

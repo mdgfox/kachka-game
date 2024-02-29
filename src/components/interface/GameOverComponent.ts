@@ -1,7 +1,7 @@
 import {Assets, Container, IDestroyOptions, Sprite, Text, TextStyle, Texture} from "pixi.js";
 import {sound} from "@pixi/sound";
-import {CommonAssets} from "../../assetsConfiguration/types";
 import {Game} from "../Game";
+import {CommonAssets} from "../types";
 
 export class GameOverComponent extends Container {
     private readonly buttonTexture: Texture;

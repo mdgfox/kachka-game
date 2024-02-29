@@ -1,7 +1,7 @@
 import {Application, Assets, Ticker} from "pixi.js";
 import {GroundComponent} from "./GroundComponent";
 import {Player} from "./Player";
-import {playerResourcesManifest} from "../assetsConfiguration/assetsManifest";
+import {playerResourcesManifest} from "../configuration/assetsManifest";
 import {sound} from "@pixi/sound";
 import {StartGameComponent} from "./interface/StartGameComponent";
 import {ScoreComponent} from "./interface/ScoreComponent";

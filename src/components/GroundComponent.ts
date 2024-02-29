@@ -1,5 +1,5 @@
 import { Assets, Sprite, Texture, Ticker } from "pixi.js";
-import {CommonAssets} from "../assetsConfiguration/types";
+import {CommonAssets} from "./types";
 
 export class GroundComponent extends Sprite{
     private readonly sharedTicker: Ticker;

@@ -27,3 +27,9 @@ export interface ObstaclesAssets {
     fly_1: Texture;
     fly_2: Texture;
 }
+
+export interface GameConfig {
+    scoreCountMultiplier: number;
+    achievementStep: number;
+    speedStepMultiplier: number;
+}

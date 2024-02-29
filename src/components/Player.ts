@@ -1,6 +1,6 @@
 import {AnimatedSprite, Assets, Sprite, Ticker} from "pixi.js";
-import { PlayerAssets} from "../assetsConfiguration/types";
 import { sound } from "@pixi/sound";
+import {PlayerAssets} from "./types";
 
 export class Player extends Sprite {
     protected assets: PlayerAssets;
