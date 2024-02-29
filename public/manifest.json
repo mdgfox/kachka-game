@@ -1,7 +1,7 @@
 {
     "name": "Duck Game",
     "description": "Just relax, and spend few minutes with playing running duck!",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "manifest_version": 3,
     "background": {},
     "permissions": [
