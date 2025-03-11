@@ -17,3 +17,8 @@ Currently, you have few options:
 * Just find this extension in Google Chrome web store (Extensions section) and play any time you need it 🎮
 * Using "build-game:dev" package.json command you can build browser version.
 * Using "build-game:prod" command you can build extension version.
+
+## TODO
+- Icon pack for chrome store (16, 32, 48, 128)
+- Promo screenshots(x2) 640x400
+- Game assets: dead, duck, idle, run, start, button, ground, enemyes
