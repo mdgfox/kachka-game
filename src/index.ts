@@ -10,4 +10,4 @@ const game = new Game();
 // @ts-expect-error
 document.body.appendChild(game.view);
 
-game.launch();
+game.launch('duck');
