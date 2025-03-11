@@ -1,24 +1,34 @@
-# PLACE_CHAR_NAME_HERE Game
+# Run, Kachka, Run!
 
-## What is it?
+Meet Kachka 🐥 — the fearless yellow rubber duck on the run!
 
-PLACE_CHAR_NAME_HERE Game is a Google Chrome extension, with which you can spend few minutes with run and jump mini-game.
-PLACE_CHAR_NAME_HERE  navigating a side-scrolling landscape. The objective is to avoid obstacles like PLACE_ENEMY_1_NAME
-and PLACE_ENEMY_2_NAME while achieving a high score. Simply press the spacebar to make PLACE_CHAR_NAME_HERE jump or arrow down, 
-to make him duck down. 
+In this endless runner, help Kachka dash through a wild landscape filled with tricky ground trees and flocks of flying birds overhead. Jump over fallen logs 🌳, dodge the swooping birds 🦅, and see how far you can go without getting caught!
 
-So, just relax and carry on!
+Simple one-tap controls, cute ducky vibes, and addictive, fast-paced action make Run, Kachka, Run! the perfect game when you need a fun, lighthearted challenge. How long can you keep Kachka running?
 
 ## What technologies are used here?
-This game is pixijs project with typescript support. Built by webpack and distributed as Google Chrome extension.
+This game is a PixiJS project with TypeScript support, built using Webpack and distributed as a Google Chrome Extension.
 
-## How to use it?
-Currently, you have few options:
-* Just find this extension in Google Chrome web store (Extensions section) and play any time you need it 🎮
-* Using "build-game:dev" package.json command you can build browser version.
-* Using "build-game:prod" command you can build extension version.
+## How to play it?
 
-## TODO
-- Icon pack for chrome store (16, 32, 48, 128)
-- Promo screenshots(x2) 640x400
-- Game assets: dead, duck, idle, run, start, button, ground, enemyes
+Just find this extension in Google Chrome Web Store (Extensions section) and play any time you need it 🎮
+
+## How to run or build it locally?
+
+Firstly run next command:
+```js
+npm i
+```
+
+You can run
+```js
+npm run build-game:dev
+```
+command to build browser version.
+
+Or you can run
+
+```js
+npm run build-game:ext
+```
+command to build chrome extension version.
