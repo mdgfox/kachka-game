@@ -1,7 +1,7 @@
 {
     "name": "Run, Kachka, Run!",
     "description": "Run fast, jump high — Kachka’s adventure awaits!",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "manifest_version": 3,
     "background": {},
     "permissions": [
@@ -22,11 +22,9 @@
         {
             "resources": [
                 "public/assets/PixelifySans.ttf",
-
                 "public/assets/sounds/achievement.wav",
                 "public/assets/sounds/gameOver.wav",
                 "public/assets/sounds/jump.wav",
-
                 "public/assets/duck/ground.png",
                 "public/assets/duck/button.png",
                 "public/assets/duck/player/dead/dead.png",
