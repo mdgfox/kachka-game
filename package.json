@@ -7,10 +7,10 @@
   "repository": "mdgfox/kachka-game",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "start": "webpack serve --config webpack/webpack.config.dev.js --env character=duck",
-    "watch": "webpack --config webpack/webpack.config.dev.js --env character=duck --watch",
-    "build-game:dev": "webpack --config webpack/webpack.config.dev.js --env character=duck",
-    "build-game:ext": "webpack --config webpack/webpack.config.ext.js --env character=duck",
+    "start": "webpack serve --config webpack/webpack.config.dev.js --env character=mallard",
+    "watch": "webpack --config webpack/webpack.config.dev.js --env character=mallard --watch",
+    "build-game:dev": "webpack --config webpack/webpack.config.dev.js --env character=mallard",
+    "build-game:ext": "webpack --config webpack/webpack.config.ext.js --env character=mallard",
     "build-game:ext:mallard": "webpack --config webpack/webpack.config.ext.js --env character=mallard"
   },
   "dependencies": {
