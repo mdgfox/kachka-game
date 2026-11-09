@@ -1,7 +1,7 @@
 {
     "name": "Run, Kachka, Run!",
     "description": "Run fast, jump high — Kachka’s adventure awaits!",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "manifest_version": 3,
     "background": {},
     "permissions": [
