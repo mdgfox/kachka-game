@@ -3,6 +3,7 @@ import {sound} from "@pixi/sound";
 import {GroundComponent} from "./GroundComponent";
 import {Player} from "./Player";
 import {SkyComponent} from "./SkyComponent";
+import {CloudsComponent} from "./CloudsComponent";
 import {DayNightCycle} from "./DayNightCycle";
 import {StartGameComponent} from "./interface/StartGameComponent";
 import {ScoreComponent} from "./interface/ScoreComponent";
@@ -35,6 +36,7 @@ export class Game extends Application {
     private readonly gameTicker: Ticker = Ticker.shared;
 
     private sky!: SkyComponent;
+    private clouds: CloudsComponent | undefined;
     private world!: Container;
     private ground!: GroundComponent;
     private obstacles!: ObstaclesFactory;
@@ -93,6 +95,8 @@ export class Game extends Application {
         this.commonAssets = commonAssets;
 
         this.sky = new SkyComponent();
+        const {theme} = characterConfig;
+        this.clouds = theme?.clouds ? new CloudsComponent(theme.cloudColors.day, theme.cloudColors.night) : undefined;
         this.ground = new GroundComponent(commonAssets.land);
         this.obstacles = new ObstaclesFactory(obstaclesAssets);
         this.player = new Player(playerAssets);
@@ -107,12 +111,18 @@ export class Game extends Application {
         this.ui = new Container();
         this.ui.addChild(this.startGameComponent, this.scoreComponent);
 
-        this.stage.addChild(this.sky, this.world, this.ui);
+        this.stage.addChild(this.sky);
+        if (this.clouds) {
+            this.stage.addChild(this.clouds);
+        }
+        this.stage.addChild(this.world, this.ui);
 
         this.dayNight = new DayNightCycle(
             this.renderer,
             this.sky,
-            characterConfig.monochrome ? [this.world] : [this.ground]
+            // themed and monochrome characters recolour the whole world, the others only their ground line
+            characterConfig.monochrome || theme ? [this.world] : [this.ground],
+            this.clouds
         );
     }
 
@@ -166,6 +176,7 @@ export class Game extends Application {
         this.ground.update(deltaTime);
         this.obstacles.update(deltaTime);
         this.sky.update(deltaTime);
+        this.clouds?.update(deltaTime);
 
         if (this.obstacles.collidesWith(this.player.hitbox)) {
             this.endGame();

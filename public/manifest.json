@@ -4,10 +4,6 @@
     "version": "1.0.10",
     "manifest_version": 3,
     "background": {},
-    "permissions": [
-        "storage",
-        "scripting"
-    ],
     "content_scripts": [
         {
             "matches": [

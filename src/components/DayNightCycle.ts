@@ -1,8 +1,10 @@
 import {ColorMatrixFilter, Container, IRenderer} from "pixi.js";
 import {SkyComponent} from "./SkyComponent";
+import {CloudsComponent} from "./CloudsComponent";
 import {applyTextColors} from "./interface/textStyles";
 import {gameConfig} from "../configuration/gameConfig";
 import {lerpColor, palette} from "../configuration/palette";
+import {characterConfig} from "../configuration/character";
 
 /**
  * Night factor for a given score: 0 = full day, 1 = full night.
@@ -27,17 +29,21 @@ export function nightFactor(score: number): number {
 export class DayNightCycle {
     private readonly renderer: IRenderer;
     private readonly sky: SkyComponent;
+    private readonly clouds: CloudsComponent | undefined;
     private readonly invertTargets: Container[];
     private readonly invertFilter = new ColorMatrixFilter();
 
     private night = -1;
 
     /**
-     * @param invertTargets containers whose (dark) pixels must be inverted at night
+     * @param invertTargets containers whose pixels get the night colour filter (inversion, or the
+     *                      character theme's tint)
+     * @param clouds themed characters only: clouds that dim at night
      */
-    public constructor(renderer: IRenderer, sky: SkyComponent, invertTargets: Container[]) {
+    public constructor(renderer: IRenderer, sky: SkyComponent, invertTargets: Container[], clouds?: CloudsComponent) {
         this.renderer = renderer;
         this.sky = sky;
+        this.clouds = clouds;
         this.invertTargets = invertTargets;
 
         this.apply(0);
@@ -63,17 +69,30 @@ export class DayNightCycle {
         applyTextColors(lerpColor(day.text, dark.text, night), lerpColor(day.textStroke, dark.textStroke, night));
 
         this.sky.setNightFactor(night);
+        this.clouds?.setNightFactor(night);
 
-        // Blend between identity (day) and "negative scaled to nightLineBrightness" (night).
-        const line = palette.nightLineBrightness;
-        const scale = (1 - night) - night * line;
-        const offset = night * line;
-        this.invertFilter.matrix = [
-            scale, 0, 0, 0, offset,
-            0, scale, 0, 0, offset,
-            0, 0, scale, 0, offset,
-            0, 0, 0, 1, 0,
-        ];
+        const tint = characterConfig.theme?.nightTint;
+        if (tint) {
+            // Coloured sprites keep their colours, they are just dimmed towards the night tint.
+            const [r, g, b] = tint.map(channel => 1 + (channel - 1) * night);
+            this.invertFilter.matrix = [
+                r, 0, 0, 0, 0,
+                0, g, 0, 0, 0,
+                0, 0, b, 0, 0,
+                0, 0, 0, 1, 0,
+            ];
+        } else {
+            // Blend between identity (day) and "negative scaled to nightLineBrightness" (night).
+            const line = palette.nightLineBrightness;
+            const scale = (1 - night) - night * line;
+            const offset = night * line;
+            this.invertFilter.matrix = [
+                scale, 0, 0, 0, offset,
+                0, scale, 0, 0, offset,
+                0, 0, scale, 0, offset,
+                0, 0, 0, 1, 0,
+            ];
+        }
 
         for (const target of this.invertTargets) {
             target.filters = night > 0 ? [this.invertFilter] : null;

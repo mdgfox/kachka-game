@@ -8,9 +8,12 @@
   "scripts": {
     "lint": "eslint . --ext .ts",
     "start": "webpack serve --config webpack/webpack.config.dev.js --env character=mallard",
+    "start:wild": "webpack serve --config webpack/webpack.config.dev.js --env character=wild",
     "watch": "webpack --config webpack/webpack.config.dev.js --env character=mallard --watch",
     "build-game:dev": "webpack --config webpack/webpack.config.dev.js --env character=mallard",
+    "build-game:dev:wild": "webpack --config webpack/webpack.config.dev.js --env character=wild",
     "build-game:ext": "webpack --config webpack/webpack.config.ext.js --env character=mallard",
+    "build-game:ext:wild": "webpack --config webpack/webpack.config.ext.js --env character=wild",
     "build-game:ext:mallard": "webpack --config webpack/webpack.config.ext.js --env character=mallard"
   },
   "dependencies": {

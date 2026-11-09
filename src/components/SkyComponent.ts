@@ -1,6 +1,7 @@
 import {Container, Graphics} from "pixi.js";
 import {gameConfig} from "../configuration/gameConfig";
 import {palette} from "../configuration/palette";
+import {characterConfig} from "../configuration/character";
 
 /** Stars and a moon that slowly drift to the left. Only visible at night. */
 export class SkyComponent extends Container {
@@ -59,11 +60,38 @@ export class SkyComponent extends Container {
         const x = 640;
         const y = 70;
 
+        if (characterConfig.theme) {
+            this.drawCrescentMoon(graphics, x, y);
+            return;
+        }
+
         graphics.beginFill(palette.moon).drawCircle(x, y, 18).endFill();
         graphics.beginFill(palette.moonCrater)
             .drawCircle(x - 6, y - 5, 4)
             .drawCircle(x + 7, y + 4, 3)
             .drawCircle(x - 2, y + 9, 2)
             .endFill();
+    }
+
+    /** A blocky crescent: a disc of 4px cells with a second, shifted disc cut out of it. */
+    private drawCrescentMoon(graphics: Graphics, cx: number, cy: number) {
+        const cell = 4;
+        const radius = 5.5;
+        const cut = {dx: 2.4, dy: -1.4, radius: 4.6};
+
+        graphics.beginFill(palette.moon);
+        for (let j = -7; j <= 7; j++) {
+            for (let i = -7; i <= 7; i++) {
+                const x = i + 0.5;
+                const y = j + 0.5;
+                const inMoon = x * x + y * y <= radius * radius;
+                const inCut = (x - cut.dx) ** 2 + (y - cut.dy) ** 2 <= cut.radius ** 2;
+
+                if (inMoon && !inCut) {
+                    graphics.drawRect(cx + i * cell, cy + j * cell, cell, cell);
+                }
+            }
+        }
+        graphics.endFill();
     }
 }
