@@ -1,128 +1,215 @@
-import {Application, Assets, Ticker} from "pixi.js";
+import {Application, Assets, Container, Ticker} from "pixi.js";
+import {sound} from "@pixi/sound";
 import {GroundComponent} from "./GroundComponent";
 import {Player} from "./Player";
-import {gameResourcesManifest} from "../configuration/assetsManifest";
-import {sound} from "@pixi/sound";
+import {SkyComponent} from "./SkyComponent";
+import {DayNightCycle} from "./DayNightCycle";
 import {StartGameComponent} from "./interface/StartGameComponent";
 import {ScoreComponent} from "./interface/ScoreComponent";
 import {GameOverComponent} from "./interface/GameOverComponent";
 import {ObstaclesFactory} from "./enemies/ObstaclesFactory";
+import {CommonAssets, ObstaclesAssets, PlayerAssets} from "./types";
+import {gameResourcesManifest} from "../configuration/assetsManifest";
+import {CHARACTER, characterConfig, CharacterName} from "../configuration/character";
+import {gameConfig} from "../configuration/gameConfig";
+import {palette} from "../configuration/palette";
+
+export enum GameState {
+    Loading,
+    Ready,
+    Running,
+    GameOver,
+}
+
+const JUMP_KEYS = ["Space", "ArrowUp"];
 
 export class Game extends Application {
-    public static WIDTH = 800;
-    public static HEIGHT = 400;
+    private state: GameState = GameState.Loading;
+    private gameOverAt = 0;
 
-    public startGameComponent: StartGameComponent | undefined;
-    public scoreComponent: ScoreComponent | undefined;
-    public gameOverComponent: GameOverComponent | undefined;
-    public groundComponent: GroundComponent | undefined;
-    public player: Player | undefined;
-    public obstaclesFactory: ObstaclesFactory | undefined;
+    /**
+     * The shared ticker drives the game simulation. It is stopped on game over
+     * (which also freezes every AnimatedSprite) while the application's own
+     * ticker keeps rendering. Its `speed` grows as the score does.
+     */
+    private readonly gameTicker: Ticker = Ticker.shared;
 
-    private startGameSignature: ((event: KeyboardEvent) => Promise<void>) | undefined;
+    private sky!: SkyComponent;
+    private world!: Container;
+    private ground!: GroundComponent;
+    private obstacles!: ObstaclesFactory;
+    private player!: Player;
+    private dayNight!: DayNightCycle;
 
-    private readonly sharedTicker: Ticker;
+    private ui!: Container;
+    private startGameComponent!: StartGameComponent;
+    private scoreComponent!: ScoreComponent;
+    private gameOverComponent: GameOverComponent | undefined;
+
+    private commonAssets!: CommonAssets;
 
     public constructor() {
-        super(
-            {
-                backgroundColor: "#fefefe",
-                backgroundAlpha: 1.0,
-                width: Game.WIDTH,
-                height: Game.HEIGHT,
-                antialias: true
-            }
+        super({
+            backgroundColor: palette.day.background,
+            backgroundAlpha: 1.0,
+            width: gameConfig.width,
+            height: gameConfig.height,
+            antialias: true,
+        });
+
+        this.gameTicker.autoStart = false;
+        this.gameTicker.stop();
+    }
+
+    public async launch(character: CharacterName = CHARACTER) {
+        await this.loadAssets(character);
+        this.buildScene(
+            await Assets.loadBundle("player") as PlayerAssets,
+            await Assets.loadBundle("obstacles") as ObstaclesAssets,
+            await Assets.loadBundle("common") as CommonAssets
         );
 
-        this.sharedTicker = Ticker.shared;
-        this.sharedTicker.autoStart = false;
-        this.sharedTicker.stop();
+        this.gameTicker.add(this.update, this);
+        window.addEventListener("keydown", this.onKeyDown);
+        window.addEventListener("keyup", this.onKeyUp);
+
+        this.state = GameState.Ready;
     }
 
+    private async loadAssets(character: CharacterName) {
+        Assets.addBundle("fonts", {Pixelify: "./public/assets/PixelifySans.ttf"});
 
-    public async launch(character: 'dino' | 'duck') {
-        await this.loadAssets(character);
-
-        this.startGameComponent = new StartGameComponent();
-        this.stage.addChild(this.startGameComponent);
-
-        this.player = await Player.build();
-        this.stage.addChild(this.player);
-
-        this.obstaclesFactory = await ObstaclesFactory.build(this.stage, this.player,() => this.endGame(), this.sharedTicker);
-
-        this.startGameSignature = (e) => this.startGame(e);
-
-        window.addEventListener("keydown", this.startGameSignature, false);
-    }
-
-    private async loadAssets(character: 'dino' | 'duck') {
-        Assets.addBundle('fonts', {"Pixelify": './public/assets/PixelifySans.ttf'});
-
-        await Assets.init({ manifest: gameResourcesManifest(character) });
-
+        await Assets.init({manifest: gameResourcesManifest(character)});
         await Assets.loadBundle("fonts");
 
-        this.loadSounds();
-    }
-
-    private loadSounds() {
         sound.add({
-            "jump": "public/assets/sounds/jump.wav",
-            "gameOver": "public/assets/sounds/gameOver.wav",
-            "achievement": "public/assets/sounds/achievement.wav"
+            jump: "public/assets/sounds/jump.wav",
+            gameOver: "public/assets/sounds/gameOver.wav",
+            achievement: "public/assets/sounds/achievement.wav",
         });
     }
 
-    async startGame(event: KeyboardEvent) {
-        if(event.code === "Space" || event.code === "ArrowUp") {
-            this.scoreComponent = new ScoreComponent(this.sharedTicker);
-            this.stage.addChild(this.scoreComponent);
+    private buildScene(playerAssets: PlayerAssets, obstaclesAssets: ObstaclesAssets, commonAssets: CommonAssets) {
+        this.commonAssets = commonAssets;
 
-            this.groundComponent = await GroundComponent.build(this.sharedTicker);
-            this.stage.addChild(this.groundComponent);
+        this.sky = new SkyComponent();
+        this.ground = new GroundComponent(commonAssets.land);
+        this.obstacles = new ObstaclesFactory(obstaclesAssets);
+        this.player = new Player(playerAssets);
 
-            if(this.startGameComponent) {
-                this.stage.removeChild(this.startGameComponent);
-            }
+        this.world = new Container();
+        this.world.addChild(this.ground, this.obstacles.view, this.player);
 
-            this.sharedTicker.start();
+        this.startGameComponent = new StartGameComponent();
+        this.scoreComponent = new ScoreComponent();
+        this.scoreComponent.visible = false;
 
-            this.player?.start();
+        this.ui = new Container();
+        this.ui.addChild(this.startGameComponent, this.scoreComponent);
 
-            this.obstaclesFactory?.start();
+        this.stage.addChild(this.sky, this.world, this.ui);
 
-            this.stage.setChildIndex(this.groundComponent, 0);
-
-            window.removeEventListener("keydown", this.startGameSignature!, false);
-        }
+        this.dayNight = new DayNightCycle(
+            this.renderer,
+            this.sky,
+            characterConfig.monochrome ? [this.world] : [this.ground]
+        );
     }
 
-    async endGame() {
-        this.sharedTicker.stop();
+    private readonly onKeyDown = (event: KeyboardEvent) => {
+        const isJumpKey = JUMP_KEYS.includes(event.code);
 
-        this.gameOverComponent = await GameOverComponent.build(this.restartGame.bind(this));
-        this.stage.addChild(this.gameOverComponent);
+        switch (this.state) {
+            case GameState.Ready:
+                if (isJumpKey && !event.repeat) {
+                    this.startGame();
+                }
+                break;
+            case GameState.Running:
+                if (isJumpKey) {
+                    this.player.jump();
+                } else if (event.code === "ArrowDown") {
+                    this.player.setDuck(true);
+                }
+                break;
+        }
+    };
 
-        this.scoreComponent?.writeLocalStorage();
-    }
-
-    async restartGame() {
-        this.player?.runAnimation();
-
-        if(this.gameOverComponent) {
-            this.gameOverComponent.destroy();
+    private readonly onKeyUp = (event: KeyboardEvent) => {
+        if (event.code === "ArrowDown") {
+            this.player.setDuck(false);
         }
 
-        this.scoreComponent?.restoreDefault();
+        if (this.state === GameState.GameOver
+            && JUMP_KEYS.includes(event.code)
+            && performance.now() - this.gameOverAt >= gameConfig.restartDelayMs) {
+            this.restartGame();
+        }
+    };
 
-        this.groundComponent?.restoreDefault();
+    private startGame() {
+        this.startGameComponent.visible = false;
+        this.scoreComponent.visible = true;
 
-        this.obstaclesFactory?.restoreDefault();
+        this.state = GameState.Running;
+        this.player.startRunning();
+        this.obstacles.start();
+        this.gameTicker.start();
+    }
 
-        this.player?.start();
+    private update(deltaTime: number) {
+        if (this.state !== GameState.Running) {
+            return;
+        }
 
-        this.sharedTicker.speed = 1;
-        this.sharedTicker.start();
+        this.player.update(deltaTime);
+        this.ground.update(deltaTime);
+        this.obstacles.update(deltaTime);
+        this.sky.update(deltaTime);
+
+        if (this.obstacles.collidesWith(this.player.hitbox)) {
+            this.endGame();
+            return;
+        }
+
+        if (this.scoreComponent.update(deltaTime)) {
+            this.gameTicker.speed *= gameConfig.speedStepMultiplier;
+            sound.play("achievement");
+        }
+
+        this.dayNight.update(this.scoreComponent.value);
+    }
+
+    private endGame() {
+        this.state = GameState.GameOver;
+        this.gameOverAt = performance.now();
+        this.gameTicker.stop();
+
+        this.player.die();
+        this.scoreComponent.saveHighScore();
+
+        this.gameOverComponent = new GameOverComponent(this.commonAssets, () => this.restartGame());
+        this.ui.addChild(this.gameOverComponent);
+
+        sound.play("gameOver");
+    }
+
+    private restartGame() {
+        if (this.state !== GameState.GameOver) {
+            return;
+        }
+
+        this.gameOverComponent?.destroy({children: true});
+        this.gameOverComponent = undefined;
+
+        this.scoreComponent.reset();
+        this.ground.reset();
+        this.obstacles.reset();
+        this.dayNight.reset();
+        this.player.startRunning();
+
+        this.state = GameState.Running;
+        this.gameTicker.speed = 1;
+        this.gameTicker.start();
     }
 }

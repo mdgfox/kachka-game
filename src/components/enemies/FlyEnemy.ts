@@ -1,49 +1,26 @@
-import {AnimatedSprite, IDestroyOptions, Sprite, Ticker} from "pixi.js";
-import {Player} from "../Player";
+import {AnimatedSprite, Rectangle} from "pixi.js";
+import {Enemy} from "./Enemy";
 import {ObstaclesAssets} from "../types";
+import {gameConfig} from "../../configuration/gameConfig";
 
-export class FlyEnemy extends Sprite {
-    private readonly player: Player;
-    private readonly sharedTicker: Ticker;
-
+export class FlyEnemy extends Enemy {
     private readonly animation: AnimatedSprite;
-    private readonly flyHeight: number;
 
-    private readonly gameOverCallback: () => void;
-
-    public constructor(assets: ObstaclesAssets, player: Player, y: number = 150, gameOverCallback: () => void, ticker: Ticker) {
+    public constructor(assets: ObstaclesAssets, flyHeight: number) {
         super();
 
         this.animation = new AnimatedSprite([assets.fly_1, assets.fly_2]);
-        this.animation.animationSpeed = 0.2;
+        this.animation.animationSpeed = gameConfig.enemies.animationSpeed;
         this.animation.play();
         this.addChild(this.animation);
-        this.flyHeight = y;
 
-        this.position.set(850, this.flyHeight);
-        this.anchor.set(0.5, 1);
-        this.player = player;
-        this.gameOverCallback = gameOverCallback;
-
-        this.sharedTicker = ticker;
-        this.sharedTicker.add(this.update, this);
+        this.position.set(gameConfig.enemies.spawnX, flyHeight);
     }
 
-    private update(deltaTime: number) {
-        const updX = this.position.x - deltaTime * 10;
-        if(updX < -100) {
-            this.destroy();
-        } else {
-            this.position.set(updX, this.flyHeight);
-            // check collision
-            if(this.animation.getBounds().intersects(this.player.bounds)) {
-                this.gameOverCallback();
-            }
-        }
-    }
+    /** The bird is drawn from its top-left corner at the enemy position. */
+    public get hitbox(): Rectangle {
+        const {width, height} = this.animation;
 
-    override destroy(_options?: IDestroyOptions | boolean) {
-        this.sharedTicker.remove(this.update, this);
-        super.destroy(_options);
+        return new Rectangle(this.x, this.y, width, height);
     }
 }

@@ -1,5 +1,6 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = (env) => {
     const character = env.character;
@@ -18,6 +19,7 @@ module.exports = (env) => {
         output: {
             path: path.join(__dirname, "../dist_ext"),
             filename: "[name].js",
+            clean: true,
         },
         resolve: {
             extensions: [".ts", ".js"],
@@ -32,6 +34,9 @@ module.exports = (env) => {
             ],
         },
         plugins: [
+            new webpack.DefinePlugin({
+                __CHARACTER__: JSON.stringify(character),
+            }),
             new CopyPlugin({
                 patterns: [
                     {
@@ -53,6 +58,8 @@ module.exports = (env) => {
                     {
                         from: path.resolve(__dirname, "../public/manifest.json"),
                         to: path.resolve(__dirname, "../dist_ext/manifest.json"),
+                        // manifest lists the default (duck) asset paths - point them at the character being built
+                        transform: (content) => content.toString().split("public/assets/duck/").join(`public/assets/${character}/`),
                     },
                     {
                         from: path.resolve(__dirname, "../public/template.html"),

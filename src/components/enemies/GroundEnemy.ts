@@ -1,38 +1,23 @@
-import {IDestroyOptions, Sprite, Texture, Ticker} from "pixi.js";
-import {Player} from "../Player";
+import {Rectangle, Sprite, Texture} from "pixi.js";
+import {Enemy} from "./Enemy";
+import {gameConfig} from "../../configuration/gameConfig";
 
-export class GroundEnemy extends Sprite {
-    private readonly player: Player;
-    private readonly sharedTicker: Ticker;
+export class GroundEnemy extends Enemy {
+    private readonly sprite: Sprite;
 
-    private readonly gameOverCallback: () => void;
+    public constructor(texture: Texture) {
+        super();
 
-    public constructor(texture: Texture, player: Player, gameOverCallback: () => void, ticker: Ticker) {
-        super(texture);
-        this.position.set(850, 360);
-        this.anchor.set(0.5, 1);
-        this.player = player;
-        this.gameOverCallback = gameOverCallback;
+        this.sprite = new Sprite(texture);
+        this.sprite.anchor.set(0.5, 1);
+        this.addChild(this.sprite);
 
-        this.sharedTicker = ticker;
-        this.sharedTicker.add(this.update, this);
+        this.position.set(gameConfig.enemies.spawnX, gameConfig.groundY);
     }
 
-    private update(deltaTime: number) {
-        const updX = this.position.x - deltaTime * 10;
-        if(updX < -100) {
-            this.destroy();
-        } else {
-            this.position.set(updX, 360);
-            // check collision
-            if(this.getBounds().intersects(this.player.bounds)) {
-                this.gameOverCallback();
-            }
-        }
-    }
+    public get hitbox(): Rectangle {
+        const {width, height} = this.sprite;
 
-    override destroy(_options?: IDestroyOptions | boolean) {
-        this.sharedTicker.remove(this.update, this);
-        super.destroy(_options);
+        return new Rectangle(this.x - width / 2, this.y - height, width, height);
     }
 }

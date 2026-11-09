@@ -1,16 +1,17 @@
 {
   "name": "kachka-game",
-  "version": "1.0.9",
+  "version": "1.0.8",
   "description": "Run, Kachka, Run!",
   "author": "mdgfox",
   "license": "MIT",
   "repository": "mdgfox/kachka-game",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "watch": "webpack --config webpack/webpack.config.dev.js --watch",
-    "build-game:dev": "webpack --config webpack/webpack.config.dev.js",
+    "start": "webpack serve --config webpack/webpack.config.dev.js --env character=duck",
+    "watch": "webpack --config webpack/webpack.config.dev.js --env character=duck --watch",
+    "build-game:dev": "webpack --config webpack/webpack.config.dev.js --env character=duck",
     "build-game:ext": "webpack --config webpack/webpack.config.ext.js --env character=duck",
-    "build-game:prod": "webpack --config webpack/webpack.config.prod.js"
+    "build-game:ext:mallard": "webpack --config webpack/webpack.config.ext.js --env character=mallard"
   },
   "dependencies": {
     "@pixi/sound": "5.2.3",
@@ -19,7 +20,6 @@
     "pixi.js": "7.4.3"
   },
   "devDependencies": {
-    "@types/pixi.js": "5.0.0",
     "@typescript-eslint/eslint-plugin": "6.13.2",
     "@typescript-eslint/parser": "6.13.2",
     "copy-webpack-plugin": "11.0.0",

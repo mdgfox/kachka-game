@@ -1,60 +1,24 @@
-import {Assets, Container, IDestroyOptions, Sprite, Text, TextStyle, Texture} from "pixi.js";
-import {sound} from "@pixi/sound";
-import {Game} from "../Game";
+import {Container, Sprite, Text} from "pixi.js";
 import {CommonAssets} from "../types";
+import {gameConfig} from "../../configuration/gameConfig";
+import {titleTextStyle} from "./textStyles";
 
 export class GameOverComponent extends Container {
-    private readonly buttonTexture: Texture;
-    private readonly textStyles: TextStyle = new TextStyle({
-        fontFamily: 'PixelifySans',
-        stroke: "white",
-        strokeThickness: 5,
-        fill:"#535353",
-        fontSize: 50
-    });
-
-    private readonly restartCallback: () => void;
-    private readonly restartGameHotKeySignature: (event: KeyboardEvent) => void;
-    private constructor(assets: CommonAssets, restartCallback: () => void) {
+    public constructor(assets: CommonAssets, restartCallback: () => void) {
         super();
 
-        const text = new Text('Game Over', this.textStyles);
+        const text = new Text("Game Over", titleTextStyle);
         text.anchor.set(0.5, 0.5);
         this.addChild(text);
 
-        this.buttonTexture = assets.button;
-        const buttonView = new Sprite(this.buttonTexture);
-        buttonView.eventMode = 'static';
-        buttonView.anchor.set(0.5, 0.5);
-        buttonView.position.set(0, 70);
+        const button = new Sprite(assets.button);
+        button.eventMode = "static";
+        button.cursor = "pointer";
+        button.anchor.set(0.5, 0.5);
+        button.position.set(0, 70);
+        button.on("pointerdown", restartCallback);
+        this.addChild(button);
 
-        this.restartCallback = restartCallback;
-        buttonView.on("pointerdown", this.restartCallback, this);
-        this.restartGameHotKeySignature = this.restartGameHotKey.bind(this);
-        setTimeout(() => {
-            window.addEventListener("keyup", this.restartGameHotKeySignature, false);
-        }, 800);
-        this.addChild(buttonView);
-
-        this.position.set(Game.WIDTH / 2, Game.HEIGHT / 2 - 50);
-
-        sound.play("gameOver");
-    }
-
-    public static async build(restartGameCallback: () => void): Promise<GameOverComponent> {
-        const assets: CommonAssets = await Assets.loadBundle("common");
-
-        return new GameOverComponent(assets, restartGameCallback);
-    }
-
-    private restartGameHotKey(event: KeyboardEvent) {
-        if(event.code === "Space" || event.code === "ArrowUp") {
-            this.restartCallback();
-        }
-    }
-
-    override destroy(_options?: IDestroyOptions | boolean) {
-        window.removeEventListener("keyup", this.restartGameHotKeySignature, false);
-        super.destroy(_options);
+        this.position.set(gameConfig.width / 2, gameConfig.height / 2 - 50);
     }
 }

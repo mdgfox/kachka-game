@@ -1,21 +1,13 @@
-import {Container, Text, TextStyle} from "pixi.js";
+import {Container, Text} from "pixi.js";
+import {scoreTextStyle} from "./textStyles";
 
 export class StartGameComponent extends Container {
-    private readonly textComponent: Text;
-
-    private textComponentStyles = new TextStyle({
-        fontFamily: 'PixelifySans',
-        stroke: "white",
-        strokeThickness: 5,
-        fill:"#535353",
-        fontSize: 30
-    });
-    constructor() {
+    public constructor() {
         super();
-        this.textComponent = new Text("Press space to play", this.textComponentStyles);
-        this.textComponent.anchor.set(0, 0);
-        this.textComponent.position.set(20, 0);
 
-        this.addChild(this.textComponent);
+        const text = new Text("Press space to play", scoreTextStyle);
+        text.anchor.set(0, 0);
+        text.position.set(20, 0);
+        this.addChild(text);
     }
 }

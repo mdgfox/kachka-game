@@ -6,8 +6,6 @@ const game = new Game();
 // eslint-disable-next-line
 (globalThis as any).__PIXI_APP__ = game;
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-document.body.appendChild(game.view);
+document.body.appendChild(game.view as HTMLCanvasElement);
 
-game.launch('duck');
+game.launch();

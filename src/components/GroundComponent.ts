@@ -1,35 +1,25 @@
-import { Assets, Sprite, Texture, Ticker } from "pixi.js";
-import {CommonAssets} from "./types";
+import {Sprite, Texture} from "pixi.js";
+import {gameConfig} from "../configuration/gameConfig";
 
-export class GroundComponent extends Sprite{
-    private readonly sharedTicker: Ticker;
-    private constructor(texture: Texture, ticker: Ticker) {
+export class GroundComponent extends Sprite {
+    public constructor(texture: Texture) {
         super(texture);
 
-        this.sharedTicker = ticker;
-
         this.anchor.set(0, 1);
-        this.position.set(0, 360);
+        this.position.set(0, gameConfig.groundY);
 
+        // second copy right after the first one makes the scroll seamless
         const ground = new Sprite(texture);
         ground.anchor.set(0, 1);
         ground.position.set(texture.width, 0);
         this.addChild(ground);
-        this.sharedTicker.add(this.update, this);
     }
 
-    public static async build(ticker: Ticker): Promise<GroundComponent> {
-        const commonAssets: CommonAssets = await Assets.loadBundle("common");
-
-        return new GroundComponent(commonAssets.land, ticker);
+    public update(deltaTime: number) {
+        this.x = (this.x - deltaTime * gameConfig.scrollSpeed) % this.texture.width;
     }
 
-    private update(deltaTime: number) {
-        const updX = this.position.x - deltaTime * 10;
-        this.position.set(updX < -this.texture.width ? 0 : updX, 360);
-    }
-
-    public restoreDefault() {
-        this.position.set(0, 360);
+    public reset() {
+        this.x = 0;
     }
 }
